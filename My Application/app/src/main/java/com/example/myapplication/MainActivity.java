@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper=new DatabaseHelper(this);
         Cursor alarms=databaseHelper.getAlarm();
 
-
         while(alarms.moveToNext()){
             ids.add(alarms.getInt(0));
             times.add(alarms.getString(1));

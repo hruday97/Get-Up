@@ -85,6 +85,8 @@ public class AlarmService extends Service {
         manager.cancel(0);
         super.onDestroy();
         mediaPlayer.stop();
+        Intent serviceIntent=new Intent(getApplicationContext(),ForegroundSrevice.class);
+        startService(serviceIntent);
         stopForeground(true);
         Intent intent=new Intent(getApplicationContext(),MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

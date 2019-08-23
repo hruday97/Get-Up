@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.strictmode.SqliteObjectLeakedViolation;
+import android.util.Log;
 
 import java.security.KeyStore;
 
@@ -89,5 +91,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
         }
     }
-    
+    public Cursor getActiveAlarm(){
+        SQLiteDatabase db=this.getWritableDatabase();
+        String query="SELECT * FROM "+name+" WHERE STATUS = ? ";
+        Cursor alarms=db.rawQuery(query,new String[]{"true"});
+        //Log.d("TAAG",alarms.getString(1));
+        return alarms;
+    }
 }
