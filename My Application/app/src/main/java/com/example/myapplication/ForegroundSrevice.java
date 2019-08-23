@@ -71,6 +71,8 @@ public class ForegroundSrevice extends Service {
                     .setAutoCancel(true);
             if(times.size()>0)
                 startForeground(id, notification.build());
+            else
+                stopForeground(true);
         }else{
             stopForeground(true);
 

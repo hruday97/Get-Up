@@ -43,6 +43,7 @@ public class Update extends AppCompatActivity implements TimePickerDialog.OnTime
         timePicker=(TextView)findViewById(R.id.timePickerDialog);
         timePicker.setText(time);
         switch1=(Switch)findViewById(R.id.switch2);
+        final Boolean orignalStatus=switch1.isChecked();
         if(status.equals("true")){
             switch1.setChecked(true);
         }
@@ -75,6 +76,7 @@ public class Update extends AppCompatActivity implements TimePickerDialog.OnTime
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
+
                 if(status=="true") {
                     Intent serviceIntent=new Intent(getApplicationContext(),ForegroundSrevice.class);
                     serviceIntent.putExtra("timeinmillis",calendar.getTimeInMillis());
@@ -87,6 +89,8 @@ public class Update extends AppCompatActivity implements TimePickerDialog.OnTime
                     Intent i = new Intent(getApplicationContext(), Alarm.class);
                     PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), id, i, 0);
                     alarmManager.cancel(pi);
+                    Intent serviceIntent=new Intent(getApplicationContext(),ForegroundSrevice.class);
+                    startService(serviceIntent);
 
                 }
                     boolean result = databaseHelper.updateAlarm(id, time, status);
@@ -94,6 +98,7 @@ public class Update extends AppCompatActivity implements TimePickerDialog.OnTime
                     Toast.makeText(getApplicationContext(),"Updated",Toast.LENGTH_SHORT);
                     Intent intent1 = new Intent(Update.this, MainActivity.class);
                     startActivity(intent1);
+
                 }
                 else
                     Toast.makeText(getApplicationContext(),"Update Failed",Toast.LENGTH_SHORT).show();
@@ -108,6 +113,8 @@ public class Update extends AppCompatActivity implements TimePickerDialog.OnTime
                 Intent i = new Intent(getApplicationContext(), Alarm.class);
                 PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), id, i, 0);
                 alarmManager.cancel(pi);
+                Intent serviceIntent=new Intent(getApplicationContext(),ForegroundSrevice.class);
+                startService(serviceIntent);
                 boolean result=databaseHelper.deleteAlarm(id);
                 if(result==true)
                 {
