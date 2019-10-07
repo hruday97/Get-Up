@@ -1,12 +1,19 @@
 package com.example.myapplication;
 
+import android.Manifest;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +35,7 @@ public class AddAlarm extends AppCompatActivity implements TimePickerDialog.OnTi
     private DatabaseHelper databaseHelper;
     private long timeinmillis;
     private Calendar calendar;
+    Integer READ_CONTACTS_CODE=1;
     private String fh,fm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,27 +59,52 @@ public class AddAlarm extends AppCompatActivity implements TimePickerDialog.OnTi
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
-                boolean result=databaseHelper.addAlarm(fh+":"+fm);
-                if(result)
-                    Toast.makeText(getApplicationContext(),"Alarm added",Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(getApplicationContext(),"Task failed",Toast.LENGTH_SHORT).show();
-                int requestCode=databaseHelper.returnLastId();
-                Intent serviceIntent=new Intent(getApplicationContext(),ForegroundSrevice.class);
-                serviceIntent.putExtra("timeinmillis",calendar.getTimeInMillis());
-                serviceIntent.putExtra("time",fh+":"+fm);
-                serviceIntent.putExtra("rc",requestCode);
-                startService(serviceIntent);
-                /*AlarmManager alarmManager=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                Intent i=new Intent(getApplicationContext(),Alarm.class);
-                i.putExtra("rc",requestCode);
-                Log.d("RC",requestCode+"");
-                //int id=databaseHelper.getId(fh+":"+fm,"true");
-                PendingIntent pi=PendingIntent.getBroadcast(getApplicationContext(),requestCode,i,0);
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pi);
-                Log.d("RC:",requestCode+"");*/
-                Intent intent=new Intent(getApplicationContext(),MainActivity.class);
-                startActivity(intent);
+
+                if(ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.READ_CONTACTS)==PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.SEND_SMS)==PackageManager.PERMISSION_GRANTED) {
+                    addAlarm();
+                }
+                else{
+                    if(ActivityCompat.shouldShowRequestPermissionRationale(AddAlarm.this,Manifest.permission.READ_CONTACTS)){
+                        new AlertDialog.Builder(AddAlarm.this)
+                                .setTitle("Permission needed")
+                                .setMessage("You cannot add alarm without permission")
+                                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        ActivityCompat.requestPermissions(AddAlarm.this,new String[] {Manifest.permission.READ_CONTACTS,Manifest.permission.SEND_SMS},READ_CONTACTS_CODE);
+                                    }
+                                })
+                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }).create().show();
+                    }
+                    else if(ActivityCompat.shouldShowRequestPermissionRationale(AddAlarm.this,Manifest.permission.READ_CONTACTS)){
+                        new AlertDialog.Builder(AddAlarm.this)
+                                .setTitle("Permission needed")
+                                .setMessage("You cannot add alarm without permission")
+                                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        ActivityCompat.requestPermissions(AddAlarm.this,new String[] {Manifest.permission.READ_CONTACTS,Manifest.permission.SEND_SMS},READ_CONTACTS_CODE);
+                                    }
+                                })
+                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }).create().show();
+                    }
+                    else{
+                        ActivityCompat.requestPermissions(AddAlarm.this,new String[] {Manifest.permission.READ_CONTACTS,Manifest.permission.SEND_SMS},READ_CONTACTS_CODE);
+
+                    }
+
+                }
+
             }
         });
     }
@@ -95,4 +128,47 @@ public class AddAlarm extends AppCompatActivity implements TimePickerDialog.OnTi
             fm=""+fmin;
         timePicker.setText(fh+":"+fm+" hours");
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode==READ_CONTACTS_CODE){
+            if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(this,"granted",Toast.LENGTH_SHORT).show();
+                //addAlarm();
+            }
+            else{
+                Toast.makeText(this,"denied",Toast.LENGTH_SHORT).show();
+            }
+            addAlarm();
+        }
+    }
+    public void addAlarm() {
+        if (fh != null && fm != null) {
+            boolean result = databaseHelper.addAlarm(fh + ":" + fm);
+            if (result)
+                Toast.makeText(getApplicationContext(), "Alarm added", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(getApplicationContext(), "Task failed", Toast.LENGTH_SHORT).show();
+            int requestCode = databaseHelper.returnLastId();
+            Intent serviceIntent = new Intent(getApplicationContext(), ForegroundSrevice.class);
+            serviceIntent.putExtra("timeinmillis", calendar.getTimeInMillis());
+            serviceIntent.putExtra("time", fh + ":" + fm);
+            serviceIntent.putExtra("rc", requestCode);
+            startService(serviceIntent);
+                /*AlarmManager alarmManager=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                Intent i=new Intent(getApplicationContext(),Alarm.class);
+                i.putExtra("rc",requestCode);
+                Log.d("RC",requestCode+"");
+                //int id=databaseHelper.getId(fh+":"+fm,"true");
+                PendingIntent pi=PendingIntent.getBroadcast(getApplicationContext(),requestCode,i,0);
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pi);
+                Log.d("RC:",requestCode+"");*/
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+        }
+        else{
+            Toast.makeText(getApplicationContext(),"time cannot be null",Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }

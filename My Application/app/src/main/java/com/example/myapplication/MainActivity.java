@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Integer> ids=new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         databaseHelper=new DatabaseHelper(this);

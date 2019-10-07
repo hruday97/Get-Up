@@ -15,6 +15,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -34,6 +36,14 @@ public class ForegroundSrevice extends Service {
         Boolean action=intent.getBooleanExtra("action",true);
         Integer id = intent.getIntExtra("rc",-1);
         long timeinmillis=intent.getLongExtra("timeinmillis",-1);
+        Calendar calendar=Calendar.getInstance();
+        long current =calendar.getTimeInMillis();
+        if(current>timeinmillis){
+            Log.d("TAG","current>time");
+            timeinmillis+=86400000;
+        }
+        Date date=new Date();
+
         Log.d("Action","Foreground service has started");
         if(action) {
             if(id!=-1) {

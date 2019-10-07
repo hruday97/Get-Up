@@ -26,6 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String create="CREATE TABLE "+name+" (ID INTEGER PRIMARY KEY AUTOINCREMENT, TIME TEXT, STATUS TEXT)";
         db.execSQL(create);
+
     }
 
     @Override
@@ -38,19 +39,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put("TIME",time);
         contentValues.put("STATUS","true");
         long result=db.insert(name,null,contentValues);
+
         if(result==-1)
             return false;
-        else{
+        else
             return true;
-        }
 
     }
+
     public boolean updateAlarm(Integer id,String time,String status){
         SQLiteDatabase db=this.getWritableDatabase();
         ContentValues contentValues=new ContentValues();
         contentValues.put("TIME",time);
         contentValues.put("STATUS",status);
         long result= db.update(name,contentValues,"ID=?", new String[]{String.valueOf(id)});
+
         if(result==-1)
             return false;
         else
@@ -61,6 +64,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues=new ContentValues();
         contentValues.put("STATUS",status);
         long result= db.update(name,contentValues,"ID=?", new String[]{String.valueOf(id)});
+
         if(result==-1)
             return false;
         else
@@ -72,6 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor alarms=db.rawQuery(query,null);
         alarms.moveToLast();
         int id=alarms.getInt(0);
+
         return id;
     }
 
@@ -79,11 +84,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db=this.getWritableDatabase();
         String query="SELECT * FROM "+name+" ORDER BY TIME";
         Cursor alarms=db.rawQuery(query,null);
+
         return alarms;
     }
     public boolean deleteAlarm(Integer id){
         SQLiteDatabase db=this.getWritableDatabase();
         long result=db.delete(name,"ID=?", new String[]{String.valueOf(id)});
+
         if(result==-1){
             return false;
         }
@@ -96,6 +103,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query="SELECT * FROM "+name+" WHERE STATUS = ? ";
         Cursor alarms=db.rawQuery(query,new String[]{"true"});
         //Log.d("TAAG",alarms.getString(1));
+
         return alarms;
     }
 }

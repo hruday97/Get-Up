@@ -78,6 +78,7 @@ public class Update extends AppCompatActivity implements TimePickerDialog.OnTime
             public void onClick(View v) {
 
                 if(status=="true") {
+                    calendar=Calendar.getInstance();
                     Intent serviceIntent=new Intent(getApplicationContext(),ForegroundSrevice.class);
                     serviceIntent.putExtra("timeinmillis",calendar.getTimeInMillis());
                     serviceIntent.putExtra("time",fh+":"+fm);
