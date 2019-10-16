@@ -81,7 +81,6 @@ public class AlarmService extends Service {
 
                     stopSelf();
                 }
-
             }
         }.start();
         boolean isAlarmOn= (boolean) intent.getBooleanExtra("isAlarmOn",false);
